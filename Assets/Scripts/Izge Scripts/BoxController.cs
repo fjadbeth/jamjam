@@ -29,7 +29,7 @@ public class BoxController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Space) && !falling)
+        if (levelManager.inputEnabled && Input.GetKeyDown(KeyCode.Space) && !falling)
         {
             rb2d.gravityScale = levelManager.gravity;
             level.GetComponent<AudioSource>().pitch = Random.Range(1, 4f);
@@ -39,7 +39,7 @@ public class BoxController : MonoBehaviour
 
         if (!stick && transform.position.y < -edgeVector.y )
         {
-            SceneManager.LoadScene("IzgeScene");
+            levelManager.EndGame();
         }
 
         //if (stick && transform.position.y < -edgeVector.y)
@@ -59,7 +59,7 @@ public class BoxController : MonoBehaviour
 
         if (transform.position.y - collision.transform.position.y >= (h1.y + h2.y) / 2)
         {
-            GetComponent<AudioSource>().Play();
+            levelManager.PlayBlockFallSound();
             stick = true;
             rb2d.isKinematic = true;
             Destroy(this);
