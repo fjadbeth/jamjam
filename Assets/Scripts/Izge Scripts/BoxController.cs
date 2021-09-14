@@ -6,17 +6,11 @@ using UnityEngine;
 public class BoxController : MonoBehaviour
 {
     Rigidbody2D rb2d;
-
-    GameObject spawner;
-    GameObject paddle;
     GameObject level;
+    LevelManager levelManager;
 
     bool stick = false;
     bool falling = false;
-    float gravity = 2f;
-
-    float heightIncrease = 0.2f;
-    float moveSpeedIncrease = 0.3f;
 
     Vector2 topRightCorner;
     Vector2 edgeVector;
@@ -25,11 +19,8 @@ public class BoxController : MonoBehaviour
     void Start()
     {
         rb2d = GetComponent<Rigidbody2D>();
-
-        spawner = GameObject.Find("Spawner");
-        paddle = GameObject.Find("Paddle");
         level = GameObject.Find("Level");
-
+        levelManager = GameObject.Find("Level").GetComponent<LevelManager>();
 
         topRightCorner = new Vector2(1, 1);
         edgeVector = Camera.main.ViewportToWorldPoint(topRightCorner);
@@ -40,7 +31,7 @@ public class BoxController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space) && !falling)
         {
-            rb2d.gravityScale = gravity;
+            rb2d.gravityScale = levelManager.gravity;
             level.GetComponent<AudioSource>().pitch = Random.Range(1, 4f);
             level.GetComponent<AudioSource>().Play();
             falling = true;
@@ -59,21 +50,9 @@ public class BoxController : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Camera.main.transform.position += new Vector3(0, heightIncrease, 0);
-        spawner.transform.position += new Vector3(0, heightIncrease, 0);
-
-        topRightCorner = new Vector2(1, 1);
-        edgeVector = Camera.main.ViewportToWorldPoint(topRightCorner);
-
-        paddle.GetComponent<MovePlatform>().moveSpeed += moveSpeedIncrease;
-        if(paddle.GetComponent<Rigidbody2D>().velocity.x > 0)
-        {
-            paddle.GetComponent<Rigidbody2D>().velocity += new Vector2(moveSpeedIncrease, 0);
-        }
-        else
-        {
-            paddle.GetComponent<Rigidbody2D>().velocity += new Vector2(-moveSpeedIncrease, 0);
-        }
+        AdjustScreenBounds();
+        levelManager.MoveCameraUpwards();
+        levelManager.IncreasePaddleSpeed();
 
         Vector3 h1 = collision.gameObject.GetComponent<Collider2D>().bounds.extents;
         Vector3 h2 = transform.GetComponent<Collider2D>().bounds.extents;
@@ -85,8 +64,14 @@ public class BoxController : MonoBehaviour
             rb2d.isKinematic = true;
             Destroy(this);
             transform.SetParent(collision.transform);
-        }
 
-       
+            levelManager.UpdateScore(1);
+        }
+    }
+
+    void AdjustScreenBounds()
+    {
+        topRightCorner = new Vector2(1, 1);
+        edgeVector = Camera.main.ViewportToWorldPoint(topRightCorner);
     }
 }
