@@ -9,15 +9,25 @@ public class MovePlatform : MonoBehaviour
 
     public float moveSpeed = 1.5f;
 
+    Vector2 edgeVector;
+
     private void Start()
     {
         Vector2 topRightCorner = new Vector2(1, 1);
-        Vector2 edgeVector = Camera.main.ViewportToWorldPoint(topRightCorner);
+        edgeVector = Camera.main.ViewportToWorldPoint(topRightCorner);
 
         x_bound = edgeVector.x - GetComponentInChildren<SpriteRenderer>().bounds.size.x / 2;
 
         rb2d = GetComponent<Rigidbody2D>();
         rb2d.velocity = new Vector2(moveSpeed, 0);
+    }
+
+    private void Update()
+    {
+        if (transform.position.y < -edgeVector.y)
+        {
+            Destroy(GetComponent<Collider2D>());
+        }
     }
 
     // Update is called once per frame
