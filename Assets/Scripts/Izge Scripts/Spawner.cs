@@ -11,7 +11,7 @@ public class Spawner : MonoBehaviour
 
     Vector2 edgeVector;
 
-    public GameObject box;
+    public List<GameObject> prefabs;
 
     // Start is called before the first frame update
     void Start()
@@ -31,7 +31,7 @@ public class Spawner : MonoBehaviour
 
             if(hit.collider == null)
             {
-                Instantiate(box, transform.position, Quaternion.identity);
+                Instantiate(prefabs[Random.Range(0, prefabs.Count)], transform.position, Quaternion.identity);
             }
 
             yield return new WaitForSeconds(spawnTimer);
